@@ -7,7 +7,7 @@ import io.micronaut.grpc.annotation.GrpcChannel
 import javax.inject.Singleton
 
 @Factory
-class GrpcFactory (@GrpcChannel(value = "KeyManager") val channel:ManagedChannel){
+class GrpcFactory (@GrpcChannel(value = "keyManager") val channel:ManagedChannel){
 
     @Singleton
     fun registraChave()=RegistraChavePixServiceGrpc.newBlockingStub(channel)
