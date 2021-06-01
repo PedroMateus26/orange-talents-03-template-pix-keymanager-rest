@@ -1,0 +1,114 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.pedromateus.pix";
+option java_outer_classname = "Pix";
+option objc_class_prefix = "HLW";
+
+package com.pedromateus.pix;
+
+import "google/protobuf/timestamp.proto";
+
+service RegistraChavePixService{
+  rpc registraChavePix(RegistraCavePixRequest) returns (RegitraChavePixResponse) {}
+}
+
+service RemoveChavePixService{
+  rpc removendoChavePix(UsuarioPixRemoveRequest) returns (UsuarioPixRemoveResponse){}
+}
+
+service BuscaUmaChavePiService{
+  rpc buscaUmachavePix(BuscaChavePixRequest) returns (BuscaChavePixResponse){}
+}
+
+service ListaChavesPixDeUmCliente{
+  rpc ListaChavePixService(ListaChavePixRequest) returns (ListaChavePixResponse){}
+}
+
+enum TipoDeChave{
+  UNKNOWN_TIPO_CHAVE=0;
+  CPF=1;
+  CELULAR=2;
+  EMAIL=3;
+  ALEATORIA=4;
+
+}
+
+enum TipoDeConta{
+  UNKNOWN_TIPO_CONTA=0;
+  CONTA_CORRENTE=1;
+  CONTA_POUPANCA=2;
+}
+
+message RegistraCavePixRequest {
+  string clienteId = 1;
+  TipoDeChave tipoDeChave=2;
+  string chave=3;
+  TipoDeConta tipoDeConta=4;
+
+}
+
+message RegitraChavePixResponse{
+  string clienteID = 1;
+  string chavePix=2;
+}
+
+message UsuarioPixRemoveRequest{
+  string clienteID=1;
+  string chavePix=2;
+}
+message UsuarioPixRemoveResponse{
+  string message =1;
+}
+
+message BuscaChavePixRequest {
+  message FiltroPorPixId {
+    string clienteID=1;
+    string chavePix=2;
+  }
+  oneof filtro{
+    FiltroPorPixId pixId =1;
+    string chave=2;
+  }
+}
+
+message BuscaChavePixResponse {
+
+  message ChavePix {
+
+    message ContaInfo {
+      TipoDeConta tipo=1;
+      string instituicao=2;
+      string nomeDoTitular=3;
+      string cpfDoTitular=4;
+      string agencia=5;
+      string numeroDeConta=6;
+    }
+
+    TipoDeChave tipoDechave=1;
+    string chave=2;
+    ContaInfo conta=3;
+    google.protobuf.Timestamp criadoEm=4;
+  }
+
+  string clientId=1;
+  string pixId=2;
+  ChavePix chave=3;
+}
+
+message ListaChavePixRequest{
+  string clienteId=1;
+}
+
+message ListaChavePixResponse{
+  message Chave{
+    string pixId=1;
+    TipoDeChave tipo=2;
+    string chave=3;
+    TipoDeConta tipoDeConta=4;
+    google.protobuf.Timestamp criadoEm=5;
+  }
+  string clienteId=1;
+  repeated Chave chaves=2;
+}
+

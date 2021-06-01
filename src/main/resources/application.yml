@@ -1,3 +1,12 @@
 micronaut:
   application:
-    name: demo
+    name: grpcRest
+
+
+grpc:
+  client:
+    plaintext: true
+    max-retry-attempts: 10
+  channels:
+    KeyManager:
+      address: "${KEY_MANAGER_HOST:localhost}:${KEY_MANAGER_PORT:50051}"
