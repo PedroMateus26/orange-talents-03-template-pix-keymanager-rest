@@ -26,7 +26,7 @@ class GlobalExceptionHandler: ExceptionHandler<StatusRuntimeException, HttpRespo
             Status.ALREADY_EXISTS.code->Pair(HttpStatus.UNPROCESSABLE_ENTITY,"Esses dados já estão registradlseo na base de dados! Não é permitido registro duplicado.")
             else->{
                 LOGGER.error("Erro inesperado!")
-                Pair(HttpStatus.I_AM_A_TEAPOT, "Deu rui demais malandro, corre para as montanhas que só Deus saber que erro deu.")
+                Pair(HttpStatus.I_AM_A_TEAPOT, "Deu rui demais malandro, corre para as montanhas que só Deus saber que erro deu.$statusDescription")
             }
         }
 
