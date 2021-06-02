@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito.any
 import org.mockito.BDDMockito.given
 import org.mockito.Mockito.mock
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.*
@@ -25,6 +26,10 @@ class BuscaChaveControllerTest{
 
     @field:Inject
     lateinit var buscaChaveClient:BuscaUmaChavePiServiceGrpc.BuscaUmaChavePiServiceBlockingStub
+
+    @field:Inject
+    lateinit var listaDeChavesClient:ListaChavesPixDeUmClienteGrpc.ListaChavesPixDeUmClienteBlockingStub
+
     @field:Inject
     @field:Client("/")
     lateinit var client:HttpClient
@@ -42,6 +47,22 @@ class BuscaChaveControllerTest{
         with(response) {
             assertEquals(HttpStatus.OK,status)
             assertNotNull(body())
+        }
+
+    }
+
+    @Test
+    fun `deve retornar uma lista`(){
+        val clienteId=UUID.randomUUID()
+        given(listaDeChavesClient.listaChavePixService(any())).willReturn(listaChavePixResponse(clienteId = clienteId.toString()))
+
+        val request=HttpRequest.GET<Any>("/api/v1/clientes/$clienteId/pix")
+        val response=client.toBlocking().exchange(request,List::class.java)
+
+        with(response){
+            assertEquals(HttpStatus.OK,status)
+            assertNotNull(body())
+            assertEquals(body().size,1)
         }
 
     }
@@ -70,8 +91,33 @@ class BuscaChaveControllerTest{
                 .build())
             .build()
 
+    private fun listaChavePixResponse(clienteId:String): ListaChavePixResponse? {
+        val chaveEmail=ListaChavePixResponse.Chave.newBuilder()
+            .setTipo(TipoDeChave.EMAIL)
+            .setChave("teste@teste.com")
+            .setTipoDeConta(TipoDeConta.CONTA_CORRENTE)
+            .setPixId(UUID.randomUUID().toString())
+            .setCriadoEm(
+                LocalDateTime.now().run{
+                    val criadoEm=this.atZone(ZoneId.of("UTC")).toInstant()
+                    Timestamp.newBuilder()
+                        .setNanos(criadoEm.nano)
+                        .setSeconds(criadoEm.epochSecond)
+                        .build()
+                })
+            .build()
+        return ListaChavePixResponse.newBuilder()
+            .setClienteId(clienteId)
+            .addAllChaves(listOf(chaveEmail))
+            .build()
+    }
+
 
     @Replaces(bean = BuscaUmaChavePiServiceGrpc.BuscaUmaChavePiServiceBlockingStub::class)
     @Singleton
     fun removeChavePix() = mock(BuscaUmaChavePiServiceGrpc.BuscaUmaChavePiServiceBlockingStub::class.java)
+
+    @Replaces(bean = ListaChavesPixDeUmClienteGrpc.ListaChavesPixDeUmClienteBlockingStub::class)
+    @Singleton
+    fun listaDeChaves()=mock(ListaChavesPixDeUmClienteGrpc.ListaChavesPixDeUmClienteBlockingStub::class.java)
 }
