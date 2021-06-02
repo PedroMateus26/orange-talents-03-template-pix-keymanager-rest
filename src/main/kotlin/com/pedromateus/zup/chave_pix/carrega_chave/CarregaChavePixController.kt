@@ -2,6 +2,7 @@ package com.pedromateus.zup.chave_pix.carrega_chave
 
 import com.pedromateus.pix.BuscaChavePixRequest
 import com.pedromateus.pix.BuscaUmaChavePiServiceGrpc
+import com.pedromateus.pix.ListaChavePixRequest
 import com.pedromateus.pix.ListaChavesPixDeUmClienteGrpc
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.Controller
@@ -35,5 +36,17 @@ class CarregaChavePixController(
 
         return HttpResponse.ok(DetalhesPixResponse(responseGrpc))
 
+    }
+
+    @Get("/pix")
+    fun carregaTodasAsChavesDeUmUsuario(clienteId:UUID):HttpResponse<Any>{
+
+        val response=listaChavesClient.listaChavePixService(ListaChavePixRequest.newBuilder().setClienteId(clienteId.toString()).build())
+
+        val chaves=response.chavesList.map {
+            ChavePixResponse(it)
+        }
+
+        return HttpResponse.ok(ClienteESuasChaves(response.clienteId,chaves))
     }
 }

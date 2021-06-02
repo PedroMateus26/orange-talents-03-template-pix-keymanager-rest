@@ -1,9 +1,11 @@
 package com.pedromateus.zup.chave_pix.carrega_chave
 
 import com.pedromateus.pix.BuscaChavePixResponse
+import com.pedromateus.pix.ListaChavePixResponse
 import com.pedromateus.pix.TipoDeConta
 import java.time.Instant
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.ZoneOffset
 
 class DetalhesPixResponse(buscaUmaChavePixResponse: BuscaChavePixResponse) {
@@ -32,3 +34,18 @@ class DetalhesPixResponse(buscaUmaChavePixResponse: BuscaChavePixResponse) {
 
 
 }
+
+class ChavePixResponse(chavePixResponse: ListaChavePixResponse.Chave){
+    val pixId=chavePixResponse.pixId
+    val tipoDeConta=chavePixResponse.tipoDeConta
+    val tipoDeChave=chavePixResponse.tipo
+    val chave=chavePixResponse.chave
+    val criadoEm=chavePixResponse.criadoEm.run {
+        LocalDateTime.ofInstant(Instant.ofEpochSecond(seconds,nanos.toLong()), ZoneId.of("UTC"))
+    }
+}
+
+class ClienteESuasChaves(
+    val clienteId:String,
+    val chaves:List<ChavePixResponse>
+)

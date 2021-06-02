@@ -34,7 +34,7 @@ internal class RemoveChavePixControllerTest {
 
 
     @BeforeEach
-    fun resetBeffore() {
+    fun resetBefore() {
         Mockito.reset(removeStub)
     }
 
